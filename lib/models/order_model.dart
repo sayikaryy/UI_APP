@@ -1,3 +1,4 @@
+import '../core/utils/currency_formatter.dart';
 import 'book_model.dart';
 import 'payment_model.dart';
 import 'user_model.dart';
@@ -23,12 +24,12 @@ class OrderItemModel {
 
   factory OrderItemModel.fromJson(Map<String, dynamic> json) {
     return OrderItemModel(
-      id: json['id'] is int ? json['id'] : int.tryParse(json['id'].toString()) ?? 0,
-      orderId: json['order_id'] is int ? json['order_id'] : int.tryParse(json['order_id'].toString()) ?? 0,
-      bookId: json['book_id'] is int ? json['book_id'] : int.tryParse(json['book_id'].toString()) ?? 0,
-      quantity: json['quantity'] is int ? json['quantity'] : int.tryParse(json['quantity'].toString()) ?? 1,
-      price: (json['price'] as num?)?.toDouble() ?? 0.0,
-      subtotal: (json['subtotal'] as num?)?.toDouble() ?? 0.0,
+      id: CurrencyFormatter.parseInt(json['id']),
+      orderId: CurrencyFormatter.parseInt(json['order_id']),
+      bookId: CurrencyFormatter.parseInt(json['book_id']),
+      quantity: CurrencyFormatter.parseInt(json['quantity'], 1),
+      price: CurrencyFormatter.parseDouble(json['price']),
+      subtotal: CurrencyFormatter.parseDouble(json['subtotal']),
       book: json['book'] != null ? BookModel.fromJson(json['book']) : null,
     );
   }
@@ -95,16 +96,16 @@ class OrderModel {
     }
 
     return OrderModel(
-      id: json['id'] is int ? json['id'] : int.tryParse(json['id'].toString()) ?? 0,
-      userId: json['user_id'] is int ? json['user_id'] : int.tryParse(json['user_id'].toString()) ?? 0,
-      orderNumber: json['order_number'] ?? '',
-      subtotal: (json['subtotal'] as num?)?.toDouble() ?? 0.0,
-      deliveryFee: (json['delivery_fee'] as num?)?.toDouble() ?? 0.0,
-      discount: (json['discount'] as num?)?.toDouble() ?? 0.0,
-      totalAmount: (json['total_amount'] as num?)?.toDouble() ?? 0.0,
-      status: json['status'] ?? 'pending',
-      shippingAddress: json['shipping_address'] ?? '',
-      deliveryMethod: json['delivery_method'] ?? 'Standard Courier',
+      id: CurrencyFormatter.parseInt(json['id']),
+      userId: CurrencyFormatter.parseInt(json['user_id']),
+      orderNumber: json['order_number']?.toString() ?? '',
+      subtotal: CurrencyFormatter.parseDouble(json['subtotal']),
+      deliveryFee: CurrencyFormatter.parseDouble(json['delivery_fee']),
+      discount: CurrencyFormatter.parseDouble(json['discount']),
+      totalAmount: CurrencyFormatter.parseDouble(json['total_amount']),
+      status: json['status']?.toString() ?? 'pending',
+      shippingAddress: json['shipping_address']?.toString() ?? '',
+      deliveryMethod: json['delivery_method']?.toString() ?? 'Standard Courier',
       phone: json['phone']?.toString(),
       note: json['note']?.toString(),
       createdAt: json['created_at'] != null

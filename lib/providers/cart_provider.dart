@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../core/utils/currency_formatter.dart';
 import '../core/constants/api_constants.dart';
 import '../core/network/api_client.dart';
 import '../models/cart_model.dart';
@@ -34,9 +35,9 @@ class CartProvider with ChangeNotifier {
             .toList();
 
         if (res['summary'] != null) {
-          _subtotal = (res['summary']['subtotal'] as num?)?.toDouble() ?? 0.0;
-          _deliveryFee = (res['summary']['delivery_fee'] as num?)?.toDouble() ?? 0.0;
-          _totalAmount = (res['summary']['total_amount'] as num?)?.toDouble() ?? 0.0;
+          _subtotal = CurrencyFormatter.parseDouble(res['summary']['subtotal']);
+          _deliveryFee = CurrencyFormatter.parseDouble(res['summary']['delivery_fee']);
+          _totalAmount = CurrencyFormatter.parseDouble(res['summary']['total_amount']);
         } else {
           _recalculate();
         }

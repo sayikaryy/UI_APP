@@ -216,7 +216,7 @@ class _DigitalReceiptViewState extends State<DigitalReceiptView> {
                         _buildTotalRow('Subtotal', CurrencyFormatter.usd(receipt.financials['subtotal'])),
                         const SizedBox(height: 4),
                         _buildTotalRow('Delivery Fee', CurrencyFormatter.usd(receipt.financials['delivery_fee'])),
-                        if ((receipt.financials['discount'] as num?)?.toDouble() != 0.0) ...[
+                        if (CurrencyFormatter.parseDouble(receipt.financials['discount']) != 0.0) ...[
                           const SizedBox(height: 4),
                           _buildTotalRow('Discount', '- ${CurrencyFormatter.usd(receipt.financials['discount'])}'),
                         ],

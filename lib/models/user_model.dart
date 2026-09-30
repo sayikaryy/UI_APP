@@ -17,7 +17,6 @@ class UserModel {
     required this.status,
   });
 
-  bool get isAdmin => role.toLowerCase() == 'admin';
   bool get isCustomer => role.toLowerCase() == 'customer';
 
   factory UserModel.fromJson(Map<String, dynamic> json) {

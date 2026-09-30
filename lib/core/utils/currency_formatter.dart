@@ -13,25 +13,27 @@ class CurrencyFormatter {
     customPattern: '#,##0 ¤',
   );
 
+  static double parseDouble(dynamic value) {
+    if (value == null) return 0.0;
+    if (value is num) return value.toDouble();
+    return double.tryParse(value.toString()) ?? 0.0;
+  }
+
+  static int parseInt(dynamic value, [int defaultValue = 0]) {
+    if (value == null) return defaultValue;
+    if (value is int) return value;
+    return int.tryParse(value.toString()) ?? defaultValue;
+  }
+
   static String usd(dynamic amount) {
     if (amount == null) return '\$0.00';
-    double value = 0.0;
-    if (amount is num) {
-      value = amount.toDouble();
-    } else if (amount is String) {
-      value = double.tryParse(amount) ?? 0.0;
-    }
+    final double value = parseDouble(amount);
     return _usdFormat.format(value);
   }
 
   static String khr(dynamic usdAmount, [double rate = 4100.0]) {
     if (usdAmount == null) return '0 ៛';
-    double value = 0.0;
-    if (usdAmount is num) {
-      value = usdAmount.toDouble();
-    } else if (usdAmount is String) {
-      value = double.tryParse(usdAmount) ?? 0.0;
-    }
+    final double value = parseDouble(usdAmount);
     return _khrFormat.format(value * rate);
   }
 

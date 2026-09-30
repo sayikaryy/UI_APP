@@ -20,8 +20,8 @@ class CheckoutView extends StatefulWidget {
 
 class _CheckoutViewState extends State<CheckoutView> {
   String _selectedPaymentMethod = 'ABA_KHQR';
-  String _deliveryMethod = 'Standard Courier (1-2 days)';
-  double _deliveryFee = 1.50;
+  final String _deliveryMethod = 'Standard Courier (1-2 days)';
+  final double _deliveryFee = 1.50;
   final _phoneController = TextEditingController();
   final _customAddressController = TextEditingController();
   final _noteController = TextEditingController();
@@ -49,13 +49,6 @@ class _CheckoutViewState extends State<CheckoutView> {
     _customAddressController.dispose();
     _noteController.dispose();
     super.dispose();
-  }
-
-  void _onDeliveryMethodChanged(String method, double fee) {
-    setState(() {
-      _deliveryMethod = method;
-      _deliveryFee = fee;
-    });
   }
 
   Future<void> _handlePlaceOrder() async {
@@ -118,10 +111,8 @@ class _CheckoutViewState extends State<CheckoutView> {
       }
 
       // Check if Cambodian QR payment was selected
-      if (_selectedPaymentMethod.contains('KHQR') || _selectedPaymentMethod.contains('BAKONG')) {
-        String bank = 'ABA';
-        if (_selectedPaymentMethod.contains('ACLEDA')) bank = 'ACLEDA';
-        if (_selectedPaymentMethod.contains('BAKONG')) bank = 'BAKONG';
+      if (_selectedPaymentMethod.contains('KHQR')) {
+        String bank = _selectedPaymentMethod.contains('ACLEDA') ? 'ACLEDA' : 'ABA';
 
         showModalBottomSheet(
           context: context,
@@ -262,42 +253,7 @@ class _CheckoutViewState extends State<CheckoutView> {
             ],
             const SizedBox(height: 20),
 
-            // 2. Delivery Method Selection
-            const Text('Delivery Speed', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppTheme.border),
-              ),
-              child: Column(
-                children: [
-                  RadioListTile<String>(
-                    value: 'Standard Courier (1-2 days)',
-                    groupValue: _deliveryMethod,
-                    activeColor: AppTheme.primary,
-                    title: const Text('Standard Courier (1-2 business days)', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                    subtitle: const Text('Phnom Penh and metropolitan areas', style: TextStyle(fontSize: 12)),
-                    secondary: const Text('\$1.50', style: TextStyle(fontWeight: FontWeight.bold)),
-                    onChanged: (val) => _onDeliveryMethodChanged(val!, 1.50),
-                  ),
-                  const Divider(height: 1, color: AppTheme.border),
-                  RadioListTile<String>(
-                    value: 'Express Delivery (Same Day)',
-                    groupValue: _deliveryMethod,
-                    activeColor: AppTheme.primary,
-                    title: const Text('Express Delivery (Same-day speed)', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                    subtitle: const Text('Delivered within 3-5 hours in Phnom Penh', style: TextStyle(fontSize: 12)),
-                    secondary: const Text('\$3.00', style: TextStyle(fontWeight: FontWeight.bold)),
-                    onChanged: (val) => _onDeliveryMethodChanged(val!, 3.00),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // 3. Cambodian Payment Method Selection
+            // 2. Cambodian Payment Method Selection
             const Text('Payment Gateway (Cambodia)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             Container(
@@ -335,22 +291,6 @@ class _CheckoutViewState extends State<CheckoutView> {
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(color: AppTheme.acledaBlue, borderRadius: BorderRadius.circular(6)),
                       child: const Text('ACLEDA', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
-                    ),
-                    onChanged: (val) => setState(() => _selectedPaymentMethod = val!),
-                  ),
-                  const Divider(height: 1, color: AppTheme.border),
-
-                  // Bakong KHQR
-                  RadioListTile<String>(
-                    value: 'BAKONG_KHQR',
-                    groupValue: _selectedPaymentMethod,
-                    activeColor: AppTheme.bakongRed,
-                    title: const Text('Bakong KHQR (National Standard)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                    subtitle: const Text('Supports all Cambodian member banks', style: TextStyle(fontSize: 12)),
-                    secondary: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(color: AppTheme.bakongRed, borderRadius: BorderRadius.circular(6)),
-                      child: const Text('KHQR', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
                     ),
                     onChanged: (val) => setState(() => _selectedPaymentMethod = val!),
                   ),

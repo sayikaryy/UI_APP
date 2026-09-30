@@ -1,3 +1,5 @@
+import '../core/utils/currency_formatter.dart';
+
 class PaymentModel {
   final int id;
   final int orderId;
@@ -27,14 +29,14 @@ class PaymentModel {
 
   factory PaymentModel.fromJson(Map<String, dynamic> json) {
     return PaymentModel(
-      id: json['id'] is int ? json['id'] : int.tryParse(json['id'].toString()) ?? 0,
-      orderId: json['order_id'] is int ? json['order_id'] : int.tryParse(json['order_id'].toString()) ?? 0,
+      id: CurrencyFormatter.parseInt(json['id']),
+      orderId: CurrencyFormatter.parseInt(json['order_id']),
       transactionId: json['transaction_id']?.toString(),
-      paymentMethod: json['payment_method'] ?? 'CASH_ON_DELIVERY',
+      paymentMethod: json['payment_method']?.toString() ?? 'CASH_ON_DELIVERY',
       bankProvider: json['bank_provider']?.toString(),
-      amount: (json['amount'] as num?)?.toDouble() ?? 0.0,
-      currency: json['currency'] ?? 'USD',
-      status: json['status'] ?? 'pending',
+      amount: CurrencyFormatter.parseDouble(json['amount']),
+      currency: json['currency']?.toString() ?? 'USD',
+      status: json['status']?.toString() ?? 'pending',
       qrString: json['qr_string']?.toString(),
       paidAt: json['paid_at'] != null ? DateTime.tryParse(json['paid_at'].toString()) : null,
     );
@@ -79,14 +81,14 @@ class KhqrDataModel {
 
   factory KhqrDataModel.fromJson(Map<String, dynamic> json) {
     return KhqrDataModel(
-      orderId: json['order_id'] is int ? json['order_id'] : int.tryParse(json['order_id'].toString()) ?? 0,
-      orderNumber: json['order_number'] ?? '',
-      amount: (json['amount'] as num?)?.toDouble() ?? 0.0,
-      currency: json['currency'] ?? 'USD',
-      bankProvider: json['bank_provider'] ?? 'ABA',
-      merchantName: json['merchant_name'] ?? 'BookVerse Cambodia',
-      qrString: json['qr_string'] ?? '',
-      transactionId: json['transaction_id'] ?? '',
+      orderId: CurrencyFormatter.parseInt(json['order_id']),
+      orderNumber: json['order_number']?.toString() ?? '',
+      amount: CurrencyFormatter.parseDouble(json['amount']),
+      currency: json['currency']?.toString() ?? 'USD',
+      bankProvider: json['bank_provider']?.toString() ?? 'ABA',
+      merchantName: json['merchant_name']?.toString() ?? 'BookVerse Cambodia',
+      qrString: json['qr_string']?.toString() ?? '',
+      transactionId: json['transaction_id']?.toString() ?? '',
     );
   }
 }

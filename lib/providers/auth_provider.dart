@@ -18,7 +18,6 @@ class AuthProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   bool get isAuthenticated => _token != null && _token!.isNotEmpty && _currentUser != null;
-  bool get isAdmin => _currentUser?.isAdmin ?? false;
   bool get isCustomer => _currentUser?.isCustomer ?? false;
 
   AuthProvider() {
@@ -153,11 +152,11 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      final res = await _apiClient.put(ApiConstants.profile, body: {
-        if (name != null) 'name': name,
-        if (phone != null) 'phone': phone,
-        if (address != null) 'address': address,
-      });
+      final body = <String, dynamic>{};
+      if (name != null) body['name'] = name;
+      if (phone != null) body['phone'] = phone;
+      if (address != null) body['address'] = address;
+      final res = await _apiClient.put(ApiConstants.profile, body: body);
 
       if (res != null && res['user'] != null) {
         _currentUser = UserModel.fromJson(res['user']);

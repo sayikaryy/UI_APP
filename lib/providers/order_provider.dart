@@ -16,6 +16,7 @@ class OrderProvider with ChangeNotifier {
 
   bool _isLoading = false;
   String? _errorMessage;
+  String? _paymentSuccessMessage;
 
   List<OrderModel> get orders => _orders;
   List<AddressModel> get addresses => _addresses;
@@ -24,6 +25,7 @@ class OrderProvider with ChangeNotifier {
   KhqrDataModel? get khqrData => _khqrData;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
+  String? get paymentSuccessMessage => _paymentSuccessMessage;
 
   AddressModel? get defaultAddress {
     if (_addresses.isEmpty) return null;
@@ -114,16 +116,20 @@ class OrderProvider with ChangeNotifier {
       });
 
       if (res != null && res['success'] == true) {
-        final order = OrderModel.fromJson(res['order'] ?? res['data']);
+        final orderData = res['order'] ?? res['data'];
+        final order = OrderModel.fromJson(orderData);
         _currentOrder = order;
         _isLoading = false;
         notifyListeners();
         return order;
+      } else {
+        _errorMessage = res?['message']?.toString() ?? 'Order placement failed.';
       }
     } on ApiException catch (e) {
       _errorMessage = e.message;
-    } catch (e) {
-      _errorMessage = 'Order processing failed.';
+    } catch (e, stackTrace) {
+      debugPrint('Error placing order: $e\n$stackTrace');
+      _errorMessage = 'Order processing failed: $e';
     }
 
     _isLoading = false;
@@ -131,9 +137,10 @@ class OrderProvider with ChangeNotifier {
     return null;
   }
 
-  Future<void> generateKhqr(int orderId, {String bank = 'ABA'}) async {
+  Future<bool> generateKhqr(int orderId, {String bank = 'ABA'}) async {
     _isLoading = true;
     _khqrData = null;
+    _errorMessage = null;
     notifyListeners();
 
     try {
@@ -144,20 +151,33 @@ class OrderProvider with ChangeNotifier {
 
       if (res != null && res['data'] != null) {
         _khqrData = KhqrDataModel.fromJson(res['data']);
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      } else {
+        _errorMessage = res?['message']?.toString() ?? 'Failed to generate KHQR code.';
       }
-    } catch (_) {}
+    } on ApiException catch (e) {
+      _errorMessage = e.message;
+    } catch (e) {
+      _errorMessage = 'Could not generate KHQR code.';
+    }
 
     _isLoading = false;
     notifyListeners();
+    return false;
   }
 
   Future<bool> simulatePaymentSuccess(int orderId) async {
     _isLoading = true;
+    _errorMessage = null;
+    _paymentSuccessMessage = null;
     notifyListeners();
 
     try {
       final res = await _apiClient.post('${ApiConstants.payments}/$orderId/simulate-success');
       if (res != null && res['success'] == true) {
+        _paymentSuccessMessage = res['message']?.toString() ?? 'Payment successfully confirmed!';
         if (_currentOrder != null && _currentOrder!.id == orderId) {
           await fetchOrderDetail(orderId);
         }
@@ -165,8 +185,14 @@ class OrderProvider with ChangeNotifier {
         _isLoading = false;
         notifyListeners();
         return true;
+      } else {
+        _errorMessage = res?['message']?.toString() ?? 'Payment simulation failed.';
       }
-    } catch (_) {}
+    } on ApiException catch (e) {
+      _errorMessage = e.message;
+    } catch (e) {
+      _errorMessage = 'An error occurred during payment confirmation.';
+    }
 
     _isLoading = false;
     notifyListeners();

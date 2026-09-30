@@ -4,7 +4,6 @@ import '../../core/constants/app_theme.dart';
 import '../../core/network/api_client.dart';
 import '../../providers/auth_provider.dart';
 import '../customer/customer_main_nav.dart';
-import '../admin/admin_main_nav.dart';
 import 'register_view.dart';
 
 class LoginView extends StatefulWidget {
@@ -46,15 +45,9 @@ class _LoginViewState extends State<LoginView> {
     if (!mounted) return;
 
     if (success) {
-      if (auth.isAdmin) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const AdminMainNav()),
-        );
-      } else {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const CustomerMainNav()),
-        );
-      }
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const CustomerMainNav()),
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -119,7 +112,7 @@ class _LoginViewState extends State<LoginView> {
           ElevatedButton(
             onPressed: () async {
               await client.setBaseUrl(urlController.text.trim());
-              if (!mounted) return;
+              if (!ctx.mounted || !mounted) return;
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text('API URL updated to: ${client.baseUrl}')),
@@ -203,7 +196,7 @@ class _LoginViewState extends State<LoginView> {
                     ),
                     const SizedBox(height: 24),
 
-                    // Quick Demo Credentials Buttons
+                    // Quick Demo Credentials Button
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
@@ -215,34 +208,20 @@ class _LoginViewState extends State<LoginView> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
-                            'Quick Demo Accounts:',
+                            'Quick Demo Account:',
                             style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.textSecondary),
                           ),
                           const SizedBox(height: 8),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: OutlinedButton.icon(
-                                  icon: const Icon(Icons.person, size: 16),
-                                  label: const Text('Customer', style: TextStyle(fontSize: 12)),
-                                  style: OutlinedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(vertical: 8),
-                                  ),
-                                  onPressed: () => _quickFill('john@example.com', 'password'),
-                                ),
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton.icon(
+                              icon: const Icon(Icons.person, size: 16),
+                              label: const Text('Customer Demo Login', style: TextStyle(fontSize: 12)),
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(vertical: 8),
                               ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: OutlinedButton.icon(
-                                  icon: const Icon(Icons.admin_panel_settings, size: 16, color: AppTheme.accent),
-                                  label: const Text('Admin', style: TextStyle(fontSize: 12)),
-                                  style: OutlinedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(vertical: 8),
-                                  ),
-                                  onPressed: () => _quickFill('admin@bookverse.com', 'password'),
-                                ),
-                              ),
-                            ],
+                              onPressed: () => _quickFill('john@example.com', 'password'),
+                            ),
                           ),
                         ],
                       ),

@@ -1,3 +1,4 @@
+import '../core/utils/currency_formatter.dart';
 import 'book_model.dart';
 
 class CartItemModel {
@@ -19,10 +20,10 @@ class CartItemModel {
 
   factory CartItemModel.fromJson(Map<String, dynamic> json) {
     return CartItemModel(
-      id: json['id'] is int ? json['id'] : int.tryParse(json['id'].toString()) ?? 0,
-      userId: json['user_id'] is int ? json['user_id'] : int.tryParse(json['user_id'].toString()) ?? 0,
-      bookId: json['book_id'] is int ? json['book_id'] : int.tryParse(json['book_id'].toString()) ?? 0,
-      quantity: json['quantity'] is int ? json['quantity'] : int.tryParse(json['quantity'].toString()) ?? 1,
+      id: CurrencyFormatter.parseInt(json['id']),
+      userId: CurrencyFormatter.parseInt(json['user_id']),
+      bookId: CurrencyFormatter.parseInt(json['book_id']),
+      quantity: CurrencyFormatter.parseInt(json['quantity'], 1),
       book: json['book'] != null ? BookModel.fromJson(json['book']) : null,
     );
   }
@@ -53,10 +54,10 @@ class CartSummaryModel {
 
   factory CartSummaryModel.fromJson(Map<String, dynamic> json) {
     return CartSummaryModel(
-      subtotal: (json['subtotal'] as num?)?.toDouble() ?? 0.0,
-      deliveryFee: (json['delivery_fee'] as num?)?.toDouble() ?? 0.0,
-      totalAmount: (json['total_amount'] as num?)?.toDouble() ?? 0.0,
-      itemsCount: json['items_count'] is int ? json['items_count'] : int.tryParse(json['items_count']?.toString() ?? '0') ?? 0,
+      subtotal: CurrencyFormatter.parseDouble(json['subtotal']),
+      deliveryFee: CurrencyFormatter.parseDouble(json['delivery_fee']),
+      totalAmount: CurrencyFormatter.parseDouble(json['total_amount']),
+      itemsCount: CurrencyFormatter.parseInt(json['items_count']),
     );
   }
 }

@@ -4,7 +4,6 @@ import '../core/constants/app_theme.dart';
 import '../providers/auth_provider.dart';
 import 'auth/login_view.dart';
 import 'customer/customer_main_nav.dart';
-import 'admin/admin_main_nav.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({super.key});
@@ -30,15 +29,9 @@ class _SplashViewState extends State<SplashView> {
     if (!mounted) return;
 
     if (isLoggedIn) {
-      if (auth.isAdmin) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const AdminMainNav()),
-        );
-      } else {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (_) => const CustomerMainNav()),
-        );
-      }
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const CustomerMainNav()),
+      );
     } else {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => const LoginView()),

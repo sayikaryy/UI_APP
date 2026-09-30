@@ -5,7 +5,6 @@ import 'providers/auth_provider.dart';
 import 'providers/book_provider.dart';
 import 'providers/cart_provider.dart';
 import 'providers/order_provider.dart';
-import 'providers/admin_provider.dart';
 import 'views/splash_view.dart';
 
 void main() {
@@ -24,7 +23,6 @@ class BookVerseApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => BookProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => OrderProvider()),
-        ChangeNotifierProvider(create: (_) => AdminProvider()),
       ],
       child: MaterialApp(
         title: 'BookVerse',
