@@ -47,79 +47,232 @@ class HomeView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 1. Promotional Hero Banner
+              // 1. Promotional Hero Banner (Minimalist & Cute in Navy Blue)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF0F172A), Color(0xFF1E293B)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 12,
-                        offset: const Offset(0, 4),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: onExploreTap,
+                    borderRadius: BorderRadius.circular(22),
+                    child: Container(
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF0C192E), Color(0xFF1E2D4A)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(22),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.08),
+                          width: 1.2,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF0C192E).withOpacity(0.35),
+                            blurRadius: 18,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(22),
+                        child: Stack(
                           children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                              decoration: BoxDecoration(
-                                color: AppTheme.accent,
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: const Text(
-                                'SPECIAL OFFER',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w800,
-                                  color: Colors.white,
+                            // Cute decorative background glow circles & star
+                            Positioned(
+                              top: -25,
+                              right: -15,
+                              child: Container(
+                                width: 120,
+                                height: 120,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: const Color(0xFF38BDF8).withOpacity(0.09),
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 10),
-                            const Text(
-                              'Upgrade Your Mind\nWith Top Bestsellers',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w800,
-                                color: Colors.white,
-                                height: 1.2,
+                            Positioned(
+                              bottom: -25,
+                              left: 60,
+                              child: Container(
+                                width: 90,
+                                height: 90,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: const Color(0xFFF59E0B).withOpacity(0.07),
+                                ),
                               ),
                             ),
-                            const SizedBox(height: 12),
-                            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppTheme.accent,
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                            Positioned(
+                              top: 14,
+                              right: 110,
+                              child: Icon(
+                                Icons.auto_awesome_rounded,
+                                size: 10,
+                                color: const Color(0xFFFDE68A).withOpacity(0.35),
                               ),
-                              onPressed: onExploreTap,
-                              child: const Text('Browse Books'),
+                            ),
+                            // Banner Content
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        // Cute Tag Pill
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFF59E0B).withOpacity(0.18),
+                                            borderRadius: BorderRadius.circular(20),
+                                            border: Border.all(
+                                              color: const Color(0xFFF59E0B).withOpacity(0.35),
+                                            ),
+                                          ),
+                                          child: const Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(
+                                                Icons.auto_awesome_rounded,
+                                                size: 11,
+                                                color: Color(0xFFFBBF24),
+                                              ),
+                                              SizedBox(width: 5),
+                                              Text(
+                                                'SPECIAL OFFER',
+                                                style: TextStyle(
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.w800,
+                                                  letterSpacing: 0.5,
+                                                  color: Color(0xFFFDE68A),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const SizedBox(height: 10),
+                                        // Headline
+                                        const Text(
+                                          'Upgrade Your Mind',
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w800,
+                                            color: Colors.white,
+                                            letterSpacing: -0.3,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 3),
+                                        const Text(
+                                          'With Top Bestsellers',
+                                          style: TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w500,
+                                            color: Color(0xFFCBD5E1),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 14),
+                                        // Cute Pill Button
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                          decoration: BoxDecoration(
+                                            color: AppTheme.accent,
+                                            borderRadius: BorderRadius.circular(20),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: AppTheme.accent.withOpacity(0.35),
+                                                blurRadius: 10,
+                                                offset: const Offset(0, 3),
+                                              ),
+                                            ],
+                                          ),
+                                          child: const Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text(
+                                                'Browse Books',
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                              SizedBox(width: 4),
+                                              Icon(
+                                                Icons.arrow_forward_rounded,
+                                                size: 13,
+                                                color: Colors.white,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 14),
+                                  // Cute Illustration Card
+                                  Container(
+                                    width: 82,
+                                    height: 82,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.08),
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(
+                                        color: Colors.white.withOpacity(0.12),
+                                      ),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(0.18),
+                                          blurRadius: 14,
+                                          offset: const Offset(0, 5),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Stack(
+                                      alignment: Alignment.center,
+                                      children: [
+                                        Container(
+                                          width: 54,
+                                          height: 54,
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFFF59E0B).withOpacity(0.15),
+                                            shape: BoxShape.circle,
+                                          ),
+                                        ),
+                                        const Icon(
+                                          Icons.auto_stories_rounded,
+                                          size: 38,
+                                          color: Color(0xFFFDE68A),
+                                        ),
+                                        Positioned(
+                                          top: 8,
+                                          right: 8,
+                                          child: Container(
+                                            padding: const EdgeInsets.all(4),
+                                            decoration: const BoxDecoration(
+                                              color: Color(0xFFF43F5E),
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: const Icon(
+                                              Icons.favorite_rounded,
+                                              size: 10,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      const Icon(
-                        Icons.menu_book_rounded,
-                        size: 80,
-                        color: Colors.white24,
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),

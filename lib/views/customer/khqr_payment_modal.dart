@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -30,15 +29,12 @@ class KhqrPaymentModal extends StatefulWidget {
 }
 
 class _KhqrPaymentModalState extends State<KhqrPaymentModal> {
-  int _secondsRemaining = 180; // 3-minute QR validity
-  Timer? _timer;
   bool _isProcessing = false;
   KhqrPaymentStatus _paymentStatus = KhqrPaymentStatus.pending;
 
   @override
   void initState() {
     super.initState();
-    _startTimer();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadQrCode();
     });
@@ -47,25 +43,6 @@ class _KhqrPaymentModalState extends State<KhqrPaymentModal> {
   void _loadQrCode() {
     Provider.of<OrderProvider>(context, listen: false)
         .generateKhqr(widget.order.id, bank: widget.bank);
-  }
-
-  void _startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (t) {
-      if (_secondsRemaining > 0) {
-        setState(() => _secondsRemaining--);
-      } else {
-        _timer?.cancel();
-        if (_paymentStatus == KhqrPaymentStatus.pending) {
-          setState(() => _paymentStatus = KhqrPaymentStatus.failed);
-        }
-      }
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
   }
 
   Color _getBankColor() {
@@ -169,134 +146,6 @@ class _KhqrPaymentModalState extends State<KhqrPaymentModal> {
     }
   }
 
-  String _formatTimer() {
-    final m = (_secondsRemaining ~/ 60).toString().padLeft(2, '0');
-    final s = (_secondsRemaining % 60).toString().padLeft(2, '0');
-    return '$m:$s';
-  }
-
-  Widget _buildStatusBadge() {
-    switch (_paymentStatus) {
-      case KhqrPaymentStatus.pending:
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          decoration: BoxDecoration(
-            color: Colors.amber.shade50,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.amber.shade400),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.pending_actions_rounded, size: 14, color: Colors.amber.shade900),
-              const SizedBox(width: 5),
-              Text(
-                'Status: PENDING',
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.amber.shade900,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                width: 1,
-                height: 12,
-                color: Colors.amber.shade300,
-              ),
-              const SizedBox(width: 8),
-              Icon(Icons.timer_outlined, size: 13, color: Colors.amber.shade900),
-              const SizedBox(width: 3),
-              Text(
-                _formatTimer(),
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.amber.shade900,
-                ),
-              ),
-            ],
-          ),
-        );
-      case KhqrPaymentStatus.processing:
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          decoration: BoxDecoration(
-            color: Colors.blue.shade50,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.blue.shade300),
-          ),
-          child: const Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(
-                width: 12,
-                height: 12,
-                child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF2563EB)),
-              ),
-              SizedBox(width: 6),
-              Text(
-                'Status: VERIFYING...',
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
-                  color: Color(0xFF1D4ED8),
-                ),
-              ),
-            ],
-          ),
-        );
-      case KhqrPaymentStatus.success:
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          decoration: BoxDecoration(
-            color: const Color(0xFFECFDF5),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: const Color(0xFF6EE7B7)),
-          ),
-          child: const Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.check_circle_rounded, size: 14, color: Color(0xFF059669)),
-              SizedBox(width: 5),
-              Text(
-                'Status: PAYMENT SUCCESSFUL',
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
-                  color: Color(0xFF047857),
-                ),
-              ),
-            ],
-          ),
-        );
-      case KhqrPaymentStatus.failed:
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          decoration: BoxDecoration(
-            color: Colors.red.shade50,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.red.shade300),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.cancel_rounded, size: 14, color: Colors.red.shade800),
-              const SizedBox(width: 5),
-              Text(
-                _secondsRemaining == 0 ? 'Status: QR EXPIRED' : 'Status: PAYMENT FAILED',
-                style: TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.red.shade800,
-                ),
-              ),
-            ],
-          ),
-        );
-    }
-  }
-
   Future<void> _simulatePaymentApproval() async {
     // Prevent duplicate payment submissions
     if (_isProcessing || _paymentStatus == KhqrPaymentStatus.success) return;
@@ -312,7 +161,6 @@ class _KhqrPaymentModalState extends State<KhqrPaymentModal> {
     if (!mounted) return;
 
     if (success) {
-      _timer?.cancel();
       setState(() {
         _isProcessing = false;
         _paymentStatus = KhqrPaymentStatus.success;
@@ -393,34 +241,28 @@ class _KhqrPaymentModalState extends State<KhqrPaymentModal> {
           ),
           const SizedBox(height: 16),
 
-          // Header with Bank Name, Logo & Status Badge
+          // Header with Bank Name & Logo
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
+              _buildBankLogo(bankColor),
+              const SizedBox(width: 10),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildBankLogo(bankColor),
-                  const SizedBox(width: 10),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _getBankDisplayName(),
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: AppTheme.textPrimary,
-                        ),
-                      ),
-                      const Text(
-                        'Bakong KHQR Standard',
-                        style: TextStyle(fontSize: 11, color: AppTheme.textSecondary),
-                      ),
-                    ],
+                  Text(
+                    _getBankDisplayName(),
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: AppTheme.textPrimary,
+                    ),
+                  ),
+                  const Text(
+                    'Bakong KHQR Standard',
+                    style: TextStyle(fontSize: 11, color: AppTheme.textSecondary),
                   ),
                 ],
               ),
-              _buildStatusBadge(),
             ],
           ),
           const SizedBox(height: 18),
