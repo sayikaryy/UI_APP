@@ -42,13 +42,13 @@ void main() {
         'payment': {
           'id': 88,
           'order_id': 42,
-          'transaction_id': 'TXN-ABA-123456',
-          'payment_method': 'ABA_KHQR',
-          'bank_provider': 'ABA',
+          'transaction_id': 'TXN-BAKONG-123456',
+          'payment_method': 'BAKONG_KHQR',
+          'bank_provider': 'BAKONG',
           'amount': '25.50',
           'currency': 'USD',
           'status': 'pending',
-          'qr_string': '00020101021229370016bakong@abaa00010108abaa_usd52045999',
+          'qr_string': '00020101021230510016abaakhppxxx@abaa0115',
         },
       };
 
@@ -68,25 +68,49 @@ void main() {
       expect(order.items.first.quantity, 2);
       expect(order.payment, isNotNull);
       expect(order.payment!.amount, 25.5);
-      expect(order.payment!.bankProvider, 'ABA');
+      expect(order.payment!.bankProvider, 'BAKONG');
     });
 
-    test('KhqrDataModel parses string amount correctly', () {
+    test('KhqrDataModel parses Bakong response with string values', () {
       final json = {
         'order_id': '42',
         'order_number': 'ORD-20260929-ABCD',
         'amount': '25.50',
         'currency': 'USD',
-        'bank_provider': 'ABA',
-        'merchant_name': 'BookVerse Cambodia',
-        'qr_string': '00020101021229370016bakong@abaa00010108abaa_usd',
-        'transaction_id': 'TXN-ABA-123',
+        'bank_provider': 'BAKONG',
+        'merchant_name': 'vathana Sieng',
+        'bakong_account_id': 'vathana_sieng@bkrt',
+        'qr_string': '00020101021229220018vathana_sieng@bkrt52045999',
+        'md5': '75368fd638de1572df38393075d55357',
+        'deeplink': 'https://bakong-deeplink.nbc.gov.kh/bakong/sample123',
+        'transaction_id': 'TXN-BAKONG-123',
+        'payment_id': '99',
+        'lifetime_minutes': '15',
+        'can_simulate': true,
       };
 
       final khqr = KhqrDataModel.fromJson(json);
       expect(khqr.orderId, 42);
       expect(khqr.amount, 25.5);
-      expect(khqr.bankProvider, 'ABA');
+      expect(khqr.bankProvider, 'BAKONG');
+      expect(khqr.bakongAccountId, 'vathana_sieng@bkrt');
+      expect(khqr.md5, '75368fd638de1572df38393075d55357');
+      expect(khqr.deeplink, 'https://bakong-deeplink.nbc.gov.kh/bakong/sample123');
+      expect(khqr.paymentId, 99);
+      expect(khqr.lifetimeMinutes, 15);
+      expect(khqr.canSimulate, isTrue);
+    });
+
+    test('KhqrDataModel defaults to Bakong with simulation off', () {
+      final khqr = KhqrDataModel.fromJson({
+        'order_id': 1,
+        'amount': 10,
+        'qr_string': '000201',
+        'transaction_id': 'TXN-BAKONG-1',
+      });
+      expect(khqr.bankProvider, 'BAKONG');
+      expect(khqr.canSimulate, isFalse);
+      expect(khqr.lifetimeMinutes, 15);
     });
 
     test('CartSummaryModel parses string decimals correctly', () {

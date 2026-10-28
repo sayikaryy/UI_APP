@@ -27,6 +27,10 @@ class _DigitalReceiptViewState extends State<DigitalReceiptView> {
   Widget build(BuildContext context) {
     final orderProv = Provider.of<OrderProvider>(context);
     final receipt = orderProv.currentReceipt;
+    final paymentMap = receipt?.payment ?? {};
+    final paymentMethod = paymentMap['payment_method']?.toString() ?? '';
+    final isCod = paymentMethod.toUpperCase().contains('CASH') || paymentMethod.toUpperCase().contains('COD');
+    final isPaid = paymentMap['payment_status']?.toString().toLowerCase() == 'paid';
 
     return Scaffold(
       backgroundColor: AppTheme.background,
@@ -74,31 +78,33 @@ class _DigitalReceiptViewState extends State<DigitalReceiptView> {
                           child: Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: const Color(0xFF10B981).withOpacity(0.1),
+                              color: (isCod ? Colors.blue : const Color(0xFF10B981)).withOpacity(0.1),
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(
-                              Icons.check_circle_rounded,
-                              color: Color(0xFF10B981),
+                            child: Icon(
+                              isCod ? Icons.local_shipping_rounded : Icons.check_circle_rounded,
+                              color: isCod ? Colors.blue.shade700 : const Color(0xFF10B981),
                               size: 40,
                             ),
                           ),
                         ),
                         const SizedBox(height: 12),
-                        const Text(
-                          'Payment Confirmed!',
+                        Text(
+                          isCod ? 'Order Placed Successfully!' : 'Payment Confirmed!',
                           textAlign: TextAlign.center,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w800,
                             color: AppTheme.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 4),
-                        const Text(
-                          'Thank you for shopping with BookVerse',
+                        Text(
+                          isCod
+                              ? 'Thank you! Please prepare cash upon delivery.'
+                              : 'Thank you for shopping with BookVerse',
                           textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 13, color: AppTheme.textSecondary),
+                          style: const TextStyle(fontSize: 13, color: AppTheme.textSecondary),
                         ),
                         const SizedBox(height: 20),
                         const Divider(color: AppTheme.border),
@@ -250,9 +256,15 @@ class _DigitalReceiptViewState extends State<DigitalReceiptView> {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF0FDF4), // Emerald 50
+                            color: isCod
+                                ? Colors.blue.shade50
+                                : const Color(0xFFF0FDF4), // Emerald 50
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: const Color(0xFFBBF7D0)),
+                            border: Border.all(
+                              color: isCod
+                                  ? Colors.blue.shade200
+                                  : const Color(0xFFBBF7D0),
+                            ),
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -261,28 +273,33 @@ class _DigitalReceiptViewState extends State<DigitalReceiptView> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    'Method: ${receipt.payment['payment_method']}',
+                                    'Method: ${isCod ? "Cash on Delivery (COD)" : (paymentMethod == "BAKONG_KHQR" ? "Bakong KHQR" : paymentMethod)}',
                                     style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    'Txn ID: ${receipt.payment['transaction_id']}',
-                                    style: const TextStyle(fontSize: 11, color: Color(0xFF15803D)),
+                                    'Txn ID: ${receipt.payment['transaction_id'] ?? 'N/A'}',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: isCod ? Colors.blue.shade700 : const Color(0xFF15803D),
+                                    ),
                                   ),
                                 ],
                               ),
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                 decoration: BoxDecoration(
-                                  color: const Color(0xFF10B981),
+                                  color: isPaid
+                                      ? const Color(0xFF10B981)
+                                      : (isCod ? Colors.blue.shade600 : const Color(0xFFF59E0B)),
                                   borderRadius: BorderRadius.circular(6),
                                 ),
-                                child: const Text(
-                                  'PAID',
-                                  style: TextStyle(
+                                child: Text(
+                                  isPaid ? 'PAID' : (isCod ? 'PAY ON ARRIVAL' : 'PENDING'),
+                                  style: const TextStyle(
                                     color: Colors.white,
                                     fontWeight: FontWeight.w900,
-                                    fontSize: 11,
+                                    fontSize: 10,
                                     letterSpacing: 0.5,
                                   ),
                                 ),

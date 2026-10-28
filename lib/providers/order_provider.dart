@@ -137,7 +137,8 @@ class OrderProvider with ChangeNotifier {
     return null;
   }
 
-  Future<bool> generateKhqr(int orderId, {String bank = 'ABA'}) async {
+  /// Requests a Bakong KHQR for the order from the backend
+  Future<bool> generateKhqr(int orderId) async {
     _isLoading = true;
     _khqrData = null;
     _errorMessage = null;
@@ -146,16 +147,18 @@ class OrderProvider with ChangeNotifier {
     try {
       final res = await _apiClient.post(ApiConstants.generateQr, body: {
         'order_id': orderId,
-        'bank_provider': bank,
       });
 
-      if (res != null && res['data'] != null) {
+      if (res != null && res['success'] == true && res['data'] != null) {
         _khqrData = KhqrDataModel.fromJson(res['data']);
         _isLoading = false;
         notifyListeners();
         return true;
       } else {
         _errorMessage = res?['message']?.toString() ?? 'Failed to generate KHQR code.';
+        if (res?['description'] != null && res!['description'].toString().isNotEmpty) {
+          _errorMessage = '${_errorMessage!}\n${res['description']}';
+        }
       }
     } on ApiException catch (e) {
       _errorMessage = e.message;
@@ -165,6 +168,23 @@ class OrderProvider with ChangeNotifier {
 
     _isLoading = false;
     notifyListeners();
+    return false;
+  }
+
+  /// Polls the backend, which verifies the payment with the Bakong Open API
+  Future<bool> checkPaymentStatus(int orderId) async {
+    try {
+      final res = await _apiClient.get(ApiConstants.checkOrderStatus(orderId));
+      if (res != null && res['is_paid'] == true) {
+        _paymentSuccessMessage = res['message']?.toString() ?? 'Payment confirmed!';
+        if (_currentOrder != null && _currentOrder!.id == orderId) {
+          await fetchOrderDetail(orderId);
+        }
+        await fetchOrders();
+        notifyListeners();
+        return true;
+      }
+    } catch (_) {}
     return false;
   }
 

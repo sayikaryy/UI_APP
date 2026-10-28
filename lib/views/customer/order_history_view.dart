@@ -165,25 +165,24 @@ class OrderHistoryView extends StatelessWidget {
                                       if (order.status == 'pending' &&
                                           order.payment != null &&
                                           !order.isPaid &&
-                                          order.payment!.paymentMethod.contains('KHQR'))
+                                          order.payment!.paymentMethod == 'BAKONG_KHQR')
                                         OutlinedButton(
                                           style: OutlinedButton.styleFrom(
                                             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                            textStyle: const TextStyle(fontSize: 11),
+                                            foregroundColor: AppTheme.bakongRed,
+                                            side: const BorderSide(color: AppTheme.bakongRed),
+                                            textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
                                           ),
                                           onPressed: () {
-                                            String bank = 'ABA';
-                                            if (order.payment!.paymentMethod.contains('ACLEDA')) bank = 'ACLEDA';
-                                            if (order.payment!.paymentMethod.contains('BAKONG')) bank = 'BAKONG';
-
                                             showModalBottomSheet(
                                               context: context,
                                               isScrollControlled: true,
                                               backgroundColor: Colors.transparent,
-                                              builder: (_) => KhqrPaymentModal(order: order, bank: bank),
+                                              barrierColor: Colors.black54,
+                                              builder: (_) => KhqrPaymentModal(order: order),
                                             );
                                           },
-                                          child: const Text('Pay Now'),
+                                          child: const Text('Pay KHQR'),
                                         ),
                                       const SizedBox(width: 6),
                                       ElevatedButton.icon(

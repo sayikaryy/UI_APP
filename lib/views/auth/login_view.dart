@@ -26,13 +26,6 @@ class _LoginViewState extends State<LoginView> {
     super.dispose();
   }
 
-  void _quickFill(String email, String pass) {
-    setState(() {
-      _emailController.text = email;
-      _passwordController.text = pass;
-    });
-  }
-
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -194,39 +187,7 @@ class _LoginViewState extends State<LoginView> {
                         color: AppTheme.textSecondary,
                       ),
                     ),
-                    const SizedBox(height: 24),
-
-                    // Quick Demo Credentials Button
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: AppTheme.surface,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppTheme.border),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Quick Demo Account:',
-                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppTheme.textSecondary),
-                          ),
-                          const SizedBox(height: 8),
-                          SizedBox(
-                            width: double.infinity,
-                            child: OutlinedButton.icon(
-                              icon: const Icon(Icons.person, size: 16),
-                              label: const Text('Customer Demo Login', style: TextStyle(fontSize: 12)),
-                              style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(vertical: 8),
-                              ),
-                              onPressed: () => _quickFill('john@example.com', 'password'),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 28),
 
                     // Email Field
                     const Text('Email Address', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),

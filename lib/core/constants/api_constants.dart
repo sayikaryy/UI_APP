@@ -28,11 +28,10 @@ class ApiConstants {
   static const String orders = '/orders';
   static const String payments = '/payments';
   static const String generateQr = '/payments/generate-qr';
+  static const String checkPaymentStatus = '/payments/check-status';
+  static String checkOrderStatus(int orderId) => '/payments/$orderId/check-status';
 
-  // Cambodian Payment Providers
-  static const String paymentAbaKhqr = 'ABA_KHQR';
-  static const String paymentAcledaKhqr = 'ACLEDA_KHQR';
+  // Supported Payment Methods (Bakong KHQR and Cash on Delivery)
   static const String paymentBakongKhqr = 'BAKONG_KHQR';
-  static const String paymentCard = 'CARD';
   static const String paymentCod = 'CASH_ON_DELIVERY';
 }

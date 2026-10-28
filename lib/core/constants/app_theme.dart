@@ -19,8 +19,6 @@ class AppTheme {
   static const Color info = Color(0xFF3B82F6); // Blue 500
 
   // Cambodian Payment Gateway Brand Colors
-  static const Color abaBlue = Color(0xFF005072);
-  static const Color acledaBlue = Color(0xFF0C3860);
   static const Color bakongRed = Color(0xFFE11D48);
 
   static ThemeData get lightTheme {

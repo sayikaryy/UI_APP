@@ -5,9 +5,9 @@ import '../../core/utils/currency_formatter.dart';
 import '../../models/book_model.dart';
 import '../../providers/cart_provider.dart';
 import '../../providers/order_provider.dart';
-import 'khqr_payment_modal.dart';
 import 'digital_receipt_view.dart';
 import 'addresses_view.dart';
+import 'khqr_payment_modal.dart';
 
 class CheckoutView extends StatefulWidget {
   final Map<String, dynamic>? directItem;
@@ -19,7 +19,7 @@ class CheckoutView extends StatefulWidget {
 }
 
 class _CheckoutViewState extends State<CheckoutView> {
-  String _selectedPaymentMethod = 'ABA_KHQR';
+  String _selectedPaymentMethod = 'BAKONG_KHQR';
   final String _deliveryMethod = 'Standard Courier (1-2 days)';
   final double _deliveryFee = 1.50;
   final _phoneController = TextEditingController();
@@ -110,18 +110,17 @@ class _CheckoutViewState extends State<CheckoutView> {
         cart.clearCart();
       }
 
-      // Check if Cambodian QR payment was selected
-      if (_selectedPaymentMethod.contains('KHQR')) {
-        String bank = _selectedPaymentMethod.contains('ACLEDA') ? 'ACLEDA' : 'ABA';
-
+      // Check payment selection flow
+      if (_selectedPaymentMethod == 'BAKONG_KHQR') {
         showModalBottomSheet(
           context: context,
           isScrollControlled: true,
           backgroundColor: Colors.transparent,
-          builder: (ctx) => KhqrPaymentModal(order: placedOrder, bank: bank),
+          barrierColor: Colors.black54,
+          builder: (_) => KhqrPaymentModal(order: placedOrder),
         );
       } else {
-        // Direct simulation / COD
+        // Cash on delivery / other
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (_) => DigitalReceiptView(orderId: placedOrder.id),
@@ -159,7 +158,28 @@ class _CheckoutViewState extends State<CheckoutView> {
     return Scaffold(
       backgroundColor: AppTheme.background,
       appBar: AppBar(
-        title: const Text('Checkout'),
+        titleSpacing: 0,
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(5),
+              decoration: const BoxDecoration(
+                color: Color(0xFF34D399),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.shopping_bag_outlined, color: Colors.white, size: 16),
+            ),
+            const SizedBox(width: 8),
+            const Text(
+              'Shopping',
+              style: TextStyle(
+                color: Color(0xFF10B981),
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
+          ],
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -253,72 +273,168 @@ class _CheckoutViewState extends State<CheckoutView> {
             ],
             const SizedBox(height: 20),
 
-            // 2. Cambodian Payment Method Selection
-            const Text('Payment Gateway (Cambodia)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppTheme.border),
+            // 2. Choose way to pay (Matching Screen 1)
+            const Text(
+              'Choose way to pay',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textPrimary),
+            ),
+            const SizedBox(height: 10),
+
+            // Bakong KHQR Card (Official NBC Gateway)
+            InkWell(
+              onTap: () => setState(() => _selectedPaymentMethod = 'BAKONG_KHQR'),
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                margin: const EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: _selectedPaymentMethod == 'BAKONG_KHQR' ? AppTheme.bakongRed : AppTheme.border,
+                    width: _selectedPaymentMethod == 'BAKONG_KHQR' ? 2 : 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: _selectedPaymentMethod == 'BAKONG_KHQR'
+                          ? AppTheme.bakongRed.withOpacity(0.08)
+                          : Colors.black.withOpacity(0.02),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    // Bakong Logo Badge
+                    Container(
+                      width: 42,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        color: AppTheme.bakongRed,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Center(
+                        child: Icon(
+                          Icons.qr_code_2_rounded,
+                          color: Colors.white,
+                          size: 26,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                'Bakong KHQR',
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.textPrimary),
+                              ),
+                              SizedBox(width: 6),
+                              DecoratedBox(
+                                decoration: BoxDecoration(
+                                  color: Color(0xFFFEE2E2),
+                                  borderRadius: BorderRadius.all(Radius.circular(6)),
+                                ),
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  child: Text(
+                                    'OFFICIAL',
+                                    style: TextStyle(
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.w800,
+                                      color: AppTheme.bakongRed,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 2),
+                          Text(
+                            'Scan with Bakong or any KHQR banking app',
+                            style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      size: 14,
+                      color: _selectedPaymentMethod == 'BAKONG_KHQR' ? AppTheme.bakongRed : Colors.grey.shade400,
+                    ),
+                  ],
+                ),
               ),
-              child: Column(
-                children: [
-                  // ABA KHQR
-                  RadioListTile<String>(
-                    value: 'ABA_KHQR',
-                    groupValue: _selectedPaymentMethod,
-                    activeColor: AppTheme.abaBlue,
-                    title: const Text('ABA PayWay KHQR', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                    subtitle: const Text('Instant QR scan via ABA Mobile App', style: TextStyle(fontSize: 12)),
-                    secondary: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(color: AppTheme.abaBlue, borderRadius: BorderRadius.circular(6)),
-                      child: const Text('ABA', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+            ),
+
+            // Cash on Delivery Card
+            InkWell(
+              onTap: () => setState(() => _selectedPaymentMethod = 'CASH_ON_DELIVERY'),
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                margin: const EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: _selectedPaymentMethod == 'CASH_ON_DELIVERY' ? const Color(0xFF10B981) : AppTheme.border,
+                    width: _selectedPaymentMethod == 'CASH_ON_DELIVERY' ? 1.5 : 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.02),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2),
                     ),
-                    onChanged: (val) => setState(() => _selectedPaymentMethod = val!),
-                  ),
-                  const Divider(height: 1, color: AppTheme.border),
-
-                  // ACLEDA KHQR
-                  RadioListTile<String>(
-                    value: 'ACLEDA_KHQR',
-                    groupValue: _selectedPaymentMethod,
-                    activeColor: AppTheme.acledaBlue,
-                    title: const Text('ACLEDA KHQR', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                    subtitle: const Text('Instant QR scan via ACLEDA Mobile', style: TextStyle(fontSize: 12)),
-                    secondary: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(color: AppTheme.acledaBlue, borderRadius: BorderRadius.circular(6)),
-                      child: const Text('ACLEDA', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    // Cash Icon Badge
+                    Container(
+                      width: 42,
+                      height: 42,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF10B981).withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Center(
+                        child: Icon(
+                          Icons.payments_outlined,
+                          color: Color(0xFF10B981),
+                          size: 22,
+                        ),
+                      ),
                     ),
-                    onChanged: (val) => setState(() => _selectedPaymentMethod = val!),
-                  ),
-                  const Divider(height: 1, color: AppTheme.border),
-
-                  // Credit Card
-                  RadioListTile<String>(
-                    value: 'CARD',
-                    groupValue: _selectedPaymentMethod,
-                    activeColor: AppTheme.primary,
-                    title: const Text('Visa / MasterCard', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                    subtitle: const Text('International credit or debit card', style: TextStyle(fontSize: 12)),
-                    secondary: const Icon(Icons.credit_card_rounded, color: AppTheme.primary),
-                    onChanged: (val) => setState(() => _selectedPaymentMethod = val!),
-                  ),
-                  const Divider(height: 1, color: AppTheme.border),
-
-                  // Cash on Delivery
-                  RadioListTile<String>(
-                    value: 'CASH_ON_DELIVERY',
-                    groupValue: _selectedPaymentMethod,
-                    activeColor: AppTheme.primary,
-                    title: const Text('Cash on Delivery (COD)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                    subtitle: const Text('Pay cash upon book package arrival', style: TextStyle(fontSize: 12)),
-                    secondary: const Icon(Icons.money_rounded, color: Colors.green),
-                    onChanged: (val) => setState(() => _selectedPaymentMethod = val!),
-                  ),
-                ],
+                    const SizedBox(width: 12),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Cash on Delivery',
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.textPrimary),
+                          ),
+                          SizedBox(height: 2),
+                          Text(
+                            'Pay cash upon book package arrival',
+                            style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      size: 14,
+                      color: _selectedPaymentMethod == 'CASH_ON_DELIVERY' ? const Color(0xFF10B981) : Colors.grey.shade400,
+                    ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 20),
@@ -388,7 +504,9 @@ class _CheckoutViewState extends State<CheckoutView> {
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size.fromHeight(52),
-                backgroundColor: AppTheme.accent,
+                backgroundColor: _selectedPaymentMethod == 'BAKONG_KHQR' ? AppTheme.bakongRed : AppTheme.accent,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
               onPressed: orderProv.isLoading ? null : _handlePlaceOrder,
               child: orderProv.isLoading
@@ -398,9 +516,9 @@ class _CheckoutViewState extends State<CheckoutView> {
                       child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
                     )
                   : Text(
-                      _selectedPaymentMethod.contains('KHQR')
-                          ? 'Generate KHQR & Pay (${CurrencyFormatter.usd(grandTotal)})'
-                          : 'Confirm & Place Order (${CurrencyFormatter.usd(grandTotal)})',
+                      _selectedPaymentMethod == 'BAKONG_KHQR'
+                          ? 'Pay with Bakong KHQR (${CurrencyFormatter.usd(grandTotal)})'
+                          : 'Place Order with Cash on Delivery (${CurrencyFormatter.usd(grandTotal)})',
                       style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
             ),
